@@ -28,6 +28,9 @@ def collect_news():
     return "\n".join(all_news)
 
 def ask_claude(news_text):
+    import requests
+    import json
+
     url = "https://api.anthropic.com/v1/messages"
     
     prompt = f"""
@@ -47,7 +50,7 @@ Here is the news:
 """
 
     headers = {
-        "x-api-key": CLAUDE_API_KEY,
+        "x-api-key": os.environ["CLAUDE_API_KEY"],
         "anthropic-version": "2023-06-01",
         "content-type": "application/json"
     }
@@ -59,7 +62,14 @@ Here is the news:
     }
 
     response = requests.post(url, headers=headers, json=json_data)
-    return response.json()["content"][0]["text"]
+    result = response.json()
+
+    # Check for error
+    if "content" not in result:
+        print("Claude API Error:", result)
+        return "Claude API returned an error. Check your API key or request format."
+
+    return result["content"][0]["text"]
 
 def send_email(text):
     import smtplib
