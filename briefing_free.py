@@ -30,6 +30,11 @@ RSS_FEEDS = {
         "https://www.cnbc.com/id/100003114/device/rss/rss.html",
         "https://www.ft.com/markets?format=rss",
         "https://www.marketwatch.com/rss/topstories"
+    ],
+    "Top Tweets": [
+    "https://nitter.net/OpenAI/rss",
+    "https://nitter.net/sama/rss",
+    "https://nitter.net/FT/rss"
     ]
 }
 
@@ -59,6 +64,11 @@ KEYWORDS = {
     "Markets & Investing": [
         "stock","market","inflation","interest rates","fed",
         "earnings","shares","investment","economy","oil","crypto"
+    ],
+    
+    "Top Tweets": [
+    "ai","startup","supply chain","market","economy",
+    "future","technology","automation","innovation"
     ]
 }
 
