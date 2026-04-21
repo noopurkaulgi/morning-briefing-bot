@@ -2,6 +2,8 @@ import feedparser
 import smtplib
 from email.mime.text import MIMEText
 import os
+from datetime import datetime, timedelta
+import time
 
 # ---------------- RSS FEEDS ----------------
 RSS_FEEDS = {
@@ -75,7 +77,7 @@ KEYWORDS = {
 # ---------------- FETCH NEWS ----------------
 def fetch_news():
     briefing = ""
-
+    cutoff_time = datetime.utcnow() - timedelta(hours=24)
     for section, feeds in RSS_FEEDS.items():
         briefing += f"🌟 {section.upper()}\n"
         collected = []
@@ -83,12 +85,23 @@ def fetch_news():
         for feed_url in feeds:
             feed = feedparser.parse(feed_url)
 
-            for entry in feed.entries:
-                title = entry.title.lower()
+          for entry in feed.entries:
 
-                # keep article ONLY if keyword matches
-                if any(word in title for word in KEYWORDS[section]):
-                    collected.append(f"- {entry.title}\n  {entry.link}")
+    # ---------------- DATE FILTER ----------------
+    if hasattr(entry, "published_parsed") and entry.published_parsed:
+        published_time = datetime.fromtimestamp(time.mktime(entry.published_parsed))
+
+        # only keep last 24 hours
+        if published_time < cutoff_time:
+            continue
+    else:
+        continue  # skip if no date available
+
+    title = entry.title.lower()
+
+    # ---------------- KEYWORD FILTER ----------------
+    if any(word in title for word in KEYWORDS[section]):
+        collected.append(f"- {entry.title}\n  {entry.link}")
 
         # remove duplicates and keep top 3
         unique_news = list(dict.fromkeys(collected))[:3]
