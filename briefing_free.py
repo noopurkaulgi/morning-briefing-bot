@@ -82,26 +82,27 @@ def fetch_news():
         briefing += f"🌟 {section.upper()}\n"
         collected = []
 
-        for feed_url in feeds:
-            feed = feedparser.parse(feed_url)
+    for feed_url in feeds:
+    feed = feedparser.parse(feed_url)
 
-          for entry in feed.entries:
+    for entry in feed.entries:
 
-    # ---------------- DATE FILTER ----------------
-    if hasattr(entry, "published_parsed") and entry.published_parsed:
-        published_time = datetime.fromtimestamp(time.mktime(entry.published_parsed))
+        # ---------------- DATE FILTER ----------------
+        if hasattr(entry, "published_parsed") and entry.published_parsed:
+            published_time = datetime.fromtimestamp(time.mktime(entry.published_parsed))
 
-        # only keep last 24 hours
-        if published_time < cutoff_time:
+            if published_time < cutoff_time:
+                continue
+        else:
             continue
-    else:
-        continue  # skip if no date available
 
-    title = entry.title.lower()
+        title = entry.title.lower()
 
-    # ---------------- KEYWORD FILTER ----------------
-    if any(word in title for word in KEYWORDS[section]):
-        collected.append(f"- {entry.title}\n  {entry.link}")
+        # ---------------- KEYWORD FILTER ----------------
+        if any(word in title for word in KEYWORDS[section]):
+            collected.append(f"- {entry.title}\n  {entry.link}")
+
+  
 
         # remove duplicates and keep top 3
         unique_news = list(dict.fromkeys(collected))[:3]
