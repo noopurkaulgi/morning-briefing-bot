@@ -34,9 +34,9 @@ RSS_FEEDS = {
         "https://www.marketwatch.com/rss/topstories"
     ],
     "Top Tweets": [
-    "https://nitter.net/OpenAI/rss",
-    "https://nitter.net/sama/rss",
-    "https://nitter.net/FT/rss"
+        "https://nitter.net/OpenAI/rss",
+        "https://nitter.net/sama/rss",
+        "https://nitter.net/FT/rss"
     ]
 }
 
@@ -67,10 +67,10 @@ KEYWORDS = {
         "stock","market","inflation","interest rates","fed",
         "earnings","shares","investment","economy","oil","crypto"
     ],
-    
+
     "Top Tweets": [
-    "ai","startup","supply chain","market","economy",
-    "future","technology","automation","innovation"
+        "ai","startup","supply chain","market","economy",
+        "future","technology","automation","innovation"
     ]
 }
 
@@ -78,31 +78,32 @@ KEYWORDS = {
 def fetch_news():
     briefing = ""
     cutoff_time = datetime.utcnow() - timedelta(hours=24)
+
     for section, feeds in RSS_FEEDS.items():
         briefing += f"🌟 {section.upper()}\n"
         collected = []
 
-    for feed_url in feeds:
-    feed = feedparser.parse(feed_url)
+        for feed_url in feeds:
+            feed = feedparser.parse(feed_url)
 
-    for entry in feed.entries:
+            for entry in feed.entries:
 
-        # ---------------- DATE FILTER ----------------
-        if hasattr(entry, "published_parsed") and entry.published_parsed:
-            published_time = datetime.fromtimestamp(time.mktime(entry.published_parsed))
+                # ---------------- DATE FILTER ----------------
+                if hasattr(entry, "published_parsed") and entry.published_parsed:
+                    published_time = datetime.fromtimestamp(
+                        time.mktime(entry.published_parsed)
+                    )
 
-            if published_time < cutoff_time:
-                continue
-        else:
-            continue
+                    if published_time < cutoff_time:
+                        continue
+                else:
+                    continue
 
-        title = entry.title.lower()
+                title = entry.title.lower()
 
-        # ---------------- KEYWORD FILTER ----------------
-        if any(word in title for word in KEYWORDS[section]):
-            collected.append(f"- {entry.title}\n  {entry.link}")
-
-  
+                # ---------------- KEYWORD FILTER ----------------
+                if any(word in title for word in KEYWORDS[section]):
+                    collected.append(f"- {entry.title}\n  {entry.link}")
 
         # remove duplicates and keep top 3
         unique_news = list(dict.fromkeys(collected))[:3]
@@ -116,7 +117,7 @@ def fetch_news():
 
     return briefing
 
-# ---- Function to send email ----
+# ---------------- EMAIL ----------------
 def send_email(body):
     EMAIL = os.environ["EMAIL"]
     PASSWORD = os.environ["EMAIL_PASSWORD"]
@@ -131,7 +132,7 @@ def send_email(body):
     server.send_message(msg)
     server.quit()
 
-# ---- Main ----
+# ---------------- MAIN ----------------
 if __name__ == "__main__":
     briefing = fetch_news()
     print("Briefing generated, sending email...")
